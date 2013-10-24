@@ -54,24 +54,33 @@
     $(document).trigger('init.searchbox')
     $.searchbox.idle()
     
+    var self = this
+
+    var search = function() {
+      var $input = $(self)
+
+      $.searchbox.resetTimer(self.timer)
+
+      self.timer = setTimeout(function() {  
+        $.searchbox.process($input.val())
+      }, $.searchbox.settings.delay)
+     
+      self.previousValue = $input.val()
+    };
+   
     return this.each(function() {
       var $input = $(this)
-      
+
       $input
       .focus()
       .ajaxStart(function() { $.searchbox.start() })
       .ajaxStop(function() { $.searchbox.stop() })
       .keyup(function() {
         if ($input.val() != this.previousValue) {
-          $.searchbox.resetTimer(this.timer)
-
-          this.timer = setTimeout(function() {  
-            $.searchbox.process($input.val())
-          }, $.searchbox.settings.delay)
-        
-          this.previousValue = $input.val()
+          search()
         }
       })
+      .on('search.searchbox', search)
     })
   }
 })(jQuery);
